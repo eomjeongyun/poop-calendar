@@ -34,3 +34,9 @@ function initEvents(){els.calendar.onclick=e=>{const day=e.target.closest('[data
 async function init(){const now=new Date();currentMonth=now<MIN_MONTH?new Date(MIN_MONTH):new Date(now.getFullYear(),now.getMonth(),1);initEvents();render();try{db=await openDB();await loadAll();navigator.storage?.persist?.().catch(()=>{});render()}catch(e){storageError();render()}if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(()=>{els.message.textContent='오프라인 준비를 완료하지 못했어요. HTTPS 주소인지 확인해 주세요.'})}
 initExtraEvents();
 init();
+
+// Best-effort daily backup to the home server (cross-origin: this app now lives on GitHub Pages).
+// Silently skipped when the PC is off, retried next time the app opens.
+const BACKUP_URL='https://appointee-unnoticed-donated.ngrok-free.dev/api/app-backup/poop-calendar';
+async function dailyBackup(){try{const today=new Date().toISOString().slice(0,10);if(localStorage.getItem('poop-backup-date')===today)return;if(!db)await openDB().then(async d=>{db=d;await loadAll()});const res=await fetch(BACKUP_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Array.from(records.values()))});if(res.ok)localStorage.setItem('poop-backup-date',today)}catch(e){}}
+setTimeout(dailyBackup,3000);

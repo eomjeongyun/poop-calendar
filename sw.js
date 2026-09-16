@@ -1,4 +1,4 @@
-const CACHE = 'poop-calendar-v4';
+const CACHE = 'poop-calendar-v5';
 const FILES = ['./','./index.html','./style.css','./app.js','./manifest.webmanifest','./fonts/Ownglyph_ParkDaHyun.woff2','./icons/icon.svg','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png'];
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(FILES)).then(() => self.skipWaiting())));
 self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())));
